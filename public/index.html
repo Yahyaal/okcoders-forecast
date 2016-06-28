@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>   <!-- Load jQuery -->
+    <!-- Bootstrap Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://rawgithub.com/darkskyapp/skycons/master/skycons.js"></script>
+</head>
+<body>
+
+    <input type="text" id="zip">                           <!-- This is an input text field for the user to tell us their name -->
+    <input type="button" id="lookup" value="Enter your zip code">   <!-- Our submit button.  'value' is the button label -->
+
+    <div id="output">
+        <div id='location'></div>
+        <table class="table table-hover" id='daily'>
+            <tr>
+              <td><b>Day</b></td>
+              <td><b>Temperature</b><br><small><b>High </b>/ Low</small></td>
+              <td><b>Description</b></td>
+              <td><b>Wind speed</b></td>
+            </tr>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        var skycons = new Skycons({"color": "blue"});
+        $(document).ready(function() {
+            $('#lookup').on('click', function() { 
+                var zip = $('#zip').val();
+                $.get('/weather/' + zip, function(result){
+                    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    $('#location').html('<h3>'+result.city+', '+result.state+'</h3>');
+                    for (var i = 0; i < result.daily.data.length; i++) {
+                        var date = new Date(result.daily.data[i].time*1000);
+                        $('#daily').append('<tr><td>'+months[date.getMonth()]+' '+date.getDate()+'</td><td><b>'+result.daily.data[i].temperatureMax+'</b> / '+result.daily.data[i].temperatureMin+'</td><td><canvas id="icon'+i+'" width="40" height="40"></canvas>&nbsp'+result.daily.data[i].summary+'</td><td>'+result.daily.data[i].windSpeed+'</td></tr>');
+                        skycons.add('icon'+i, result.daily.data[i].icon);
+                        skycons.play();
+                    };
+                    
+                });
+                
+            });
+        });
+    </script>
+</body>
+</html>
